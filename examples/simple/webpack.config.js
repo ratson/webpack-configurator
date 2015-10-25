@@ -1,3 +1,4 @@
+var assert = require('assert')
 var Path = require("path");
 var Webpack = require("webpack");
 var Config = require("../../");
@@ -8,7 +9,7 @@ module.exports = (function() {
     config.merge({
         entry: "./main.js",
         output: {
-            filename: "bundle.js"       
+            filename: "bundle.js"
         }
     });
 
@@ -21,12 +22,16 @@ module.exports = (function() {
 
     config.loader("sass", {
         test: /\.scss$/,
-        loader: "style!css!sass?indentedSyntax"
+        loaders: ["style", "css", "sass?indentedSyntax"]
     });
 
     config.plugin("webpack-define", Webpack.DefinePlugin, [{
         VERSION: "1.0.0"
     }]);
 
-    return config.resolve();
+    var finalConfig = config.resolve()
+    assert(finalConfig.module.loaders[1].loaders)
+    assert.notEqual(finalConfig.module.loaders[1].loader, 'sass')
+
+    return finalConfig
 })();
